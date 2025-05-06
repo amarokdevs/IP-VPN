@@ -1,0 +1,713 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   IP &amp; VPN Detector &amp; Speed Test - Calm &amp; Premium
+  </title>
+  <meta content="Check your public IP address, VPN status, geolocation, and internet speed with a calm, premium glassmorphism design." name="description"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+  <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" referrerpolicy="no-referrer" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+   /* Background: soft white with subtle warm tint */
+    body {
+      background: #f9fafb;
+      font-family: "Inter", sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    /* Glassmorphism container */
+    .glass {
+      background: rgba(255 255 255 / 0.15);
+      border: 1.5px solid rgba(255 255 255 / 0.3);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      border-radius: 1.5rem;
+      color: #1e293b;
+      max-width: 480px;
+      width: 100%;
+      padding: 2.5rem 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      user-select: none;
+      transition: box-shadow 0.3s ease;
+    }
+    .glass:focus-within,
+    .glass:hover {
+      box-shadow: 0 16px 48px 0 rgba(31, 38, 135, 0.5);
+    }
+    /* subtle fade-in animation */
+    .fade-in {
+      animation: fadeIn 1.2s ease forwards;
+      opacity: 0;
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+    /* IP box styling */
+    #ip-box {
+      background: rgba(255 255 255 / 0.25);
+      border-radius: 1rem;
+      border: 1.5px solid rgba(255 255 255 / 0.4);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      box-shadow: 0 8px 24px rgba(255 255 255 / 0.15);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      user-select: text;
+      position: relative;
+      flex-wrap: nowrap;
+      max-width: 480px;
+      margin: 0 auto 1.5rem auto;
+    }
+    #ip-box:hover {
+      background: rgba(255 255 255 / 0.35);
+      border-color: rgba(255 255 255 / 0.6);
+      box-shadow: 0 12px 32px rgba(255 255 255 / 0.3);
+    }
+    #country-flag {
+      width: 56px;
+      height: 38px;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      flex-shrink: 0;
+      user-select: none;
+      object-fit: cover;
+    }
+    #ip-address {
+      font-weight: 700;
+      font-size: 1.875rem;
+      color: #1e293b;
+      letter-spacing: 0.02em;
+      user-select: text;
+      word-break: break-word;
+      max-width: 100%;
+      line-height: 1.2;
+      flex-grow: 1;
+      min-width: 140px;
+    }
+    /* Copy icon button */
+    #copy-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #475569;
+      font-size: 1.25rem;
+      transition: color 0.3s ease;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    #copy-btn:hover,
+    #copy-btn:focus {
+      color: #2563eb;
+      outline: none;
+    }
+    #copy-tooltip {
+      position: absolute;
+      top: -2.5rem;
+      right: 1.5rem;
+      background: #2563eb;
+      color: white;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      user-select: none;
+      white-space: nowrap;
+      font-weight: 600;
+      z-index: 10;
+    }
+    #copy-tooltip.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* VPN label styling */
+    #vpn-status {
+      background: rgba(248, 113, 113, 0.15);
+      color: #b91c1c;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 0 8px rgba(248, 113, 113, 0.4);
+      user-select: none;
+      max-width: fit-content;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    #vpn-status.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #vpn-status i {
+      font-size: 1.15rem;
+    }
+    /* Geolocation section */
+    #geo-section {
+      text-align: center;
+      color: #475569;
+      user-select: none;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    #location {
+      font-weight: 600;
+      font-size: 1.25rem;
+      line-height: 1.3;
+      margin-bottom: 0.25rem;
+      word-break: break-word;
+    }
+    #isp {
+      font-weight: 400;
+      font-size: 1rem;
+      color: #64748b;
+      word-break: break-word;
+    }
+    /* Speed test button */
+    #speed-test-btn {
+      background-color: #2563eb;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 1.5rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease;
+      align-self: center;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      border: none;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    #speed-test-btn:hover,
+    #speed-test-btn:focus {
+      background-color: #1e40af;
+      outline: none;
+      box-shadow: 0 6px 20px rgba(30, 64, 175, 0.6);
+    }
+    /* Speed test container */
+    #speed-test-container {
+      background: rgba(255 255 255 / 0.25);
+      border-radius: 1rem;
+      border: 1.5px solid rgba(255 255 255 / 0.4);
+      padding: 1.5rem 2rem;
+      box-shadow: 0 8px 24px rgba(255 255 255 / 0.15);
+      user-select: none;
+      display: none;
+      flex-direction: column;
+      gap: 1.25rem;
+      color: #1e293b;
+      font-weight: 600;
+      font-size: 1rem;
+      line-height: 1.3;
+      text-align: center;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      transition: opacity 0.5s ease;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    #speed-test-container.visible {
+      display: flex;
+      animation: fadeIn 0.8s ease forwards;
+      opacity: 1;
+    }
+    /* Speed test results styling */
+    .speed-result {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: #1e293b;
+    }
+    /* Loading spinner */
+    .spinner {
+      border: 4px solid rgba(37, 99, 235, 0.2);
+      border-top: 4px solid #2563eb;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    /* Powered by and developer box */
+    #powered-by {
+      background: rgba(255 255 255 / 0.25);
+      border-radius: 1rem;
+      border: 1.5px solid rgba(255 255 255 / 0.4);
+      padding: 0.75rem 1.5rem;
+      box-shadow: 0 8px 24px rgba(255 255 255 / 0.15);
+      text-align: center;
+      font-size: 0.875rem;
+      color: #475569;
+      user-select: none;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      max-width: 480px;
+      margin: 1.5rem auto 0 auto;
+      font-weight: 500;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    #powered-by a {
+      color: #2563eb;
+      text-decoration: underline;
+      transition: color 0.3s ease;
+    }
+    #powered-by a:hover,
+    #powered-by a:focus {
+      color: #1e40af;
+      outline: none;
+    }
+    #developer-credit {
+      font-size: 0.875rem;
+      color: #64748b;
+      font-weight: 400;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .glass {
+        padding: 2rem 1.75rem;
+        max-width: 100%;
+      }
+      #ip-address {
+        font-size: 1.5rem;
+      }
+      #country-flag {
+        width: 48px;
+        height: 32px;
+      }
+      #vpn-status {
+        font-size: 0.9rem;
+      }
+      #location {
+        font-size: 1.125rem;
+      }
+      #isp {
+        font-size: 0.9rem;
+      }
+      #speed-test-btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 1.25rem;
+      }
+      .speed-result {
+        font-size: 1rem;
+      }
+      #powered-by {
+        max-width: 100%;
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+      }
+    }
+  </style>
+ </head>
+ <body>
+  <main aria-label="IP address, VPN detection and speed test information" class="fade-in flex flex-col items-center gap-6" role="main" tabindex="0" style="width:100%;max-width:480px;">
+   <section id="ip-box" aria-label="Your public IP address and country flag" role="region" class="glass flex items-center justify-center gap-4 select-text relative flex-nowrap w-full">
+    <img alt="Country flag" aria-hidden="true" class="shadow-md" height="38" id="country-flag" src="https://storage.googleapis.com/a1aa/image/4843e450-7d9d-4807-1fb5-0e4b63fd860d.jpg" width="56"/>
+    <p aria-label="Your public IP address" id="ip-address" lang="en" class="font-bold text-3xl text-slate-900 leading-tight flex-grow min-w-[140px] break-words">
+     Loading IP...
+    </p>
+    <button aria-label="Copy IP address to clipboard" id="copy-btn" title="Copy IP address" type="button" class="bg-transparent border-none cursor-pointer text-slate-600 text-xl p-0 flex items-center justify-center transition-colors hover:text-blue-600 focus:outline-none">
+     <i aria-hidden="true" class="fas fa-copy"></i>
+    </button>
+    <div aria-atomic="true" aria-live="polite" id="copy-tooltip" role="tooltip" class="absolute top-[-2.5rem] right-6 bg-blue-600 text-white text-xs px-2 py-1 rounded select-none opacity-0 pointer-events-none font-semibold whitespace-nowrap transition-opacity z-10">
+     Copied!
+    </div>
+   </section>
+   <p aria-live="assertive" class="glass hidden opacity-0 transition-opacity duration-500" id="vpn-status" role="alert" style="max-width:480px; margin:0 auto; padding:0.5rem 1rem; border-radius:9999px; box-shadow:0 0 8px rgba(248, 113, 113, 0.4); color:#b91c1c; font-weight:600; font-size:1rem; display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;">
+    <i aria-hidden="true" class="fas fa-shield-alt text-lg"></i>
+    You are using a VPN or Proxy
+   </p>
+   <section aria-atomic="true" aria-live="polite" class="flex flex-col items-center gap-6 w-full" id="ip-section">
+    <button aria-controls="speed-test-container" aria-expanded="false" aria-label="Start internet speed test" id="speed-test-btn" type="button" class="glass flex items-center gap-2 bg-blue-600 text-white font-semibold px-6 py-2 rounded-full cursor-pointer select-none shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors text-lg max-w-[280px] mx-auto">
+     <i class="fas fa-tachometer-alt"></i>
+     Run Speed Test
+    </button>
+   </section>
+   <section aria-atomic="true" aria-label="Internet speed test results" aria-live="polite" id="speed-test-container" role="region" class="glass flex flex-col gap-4 text-slate-900 font-semibold text-base leading-relaxed text-center w-full max-w-[480px] p-6 rounded-lg border border-white/40 shadow-lg backdrop-blur-md bg-white/15 hidden">
+    <div id="speed-test-status" class="text-center text-slate-700 font-semibold">
+     Click "Run Speed Test" to begin
+    </div>
+    <div id="speed-results" class="hidden flex-col gap-2">
+     <div class="speed-result flex justify-between font-semibold text-lg text-slate-900">
+      <span>Ping:</span>
+      <span id="ping-result">-- ms</span>
+     </div>
+     <div class="speed-result flex justify-between font-semibold text-lg text-slate-900">
+      <span>Download:</span>
+      <span id="download-result">-- Mbps</span>
+     </div>
+     <div class="speed-result flex justify-between font-semibold text-lg text-slate-900">
+      <span>Upload:</span>
+      <span id="upload-result">-- Mbps</span>
+     </div>
+    </div>
+   </section>
+   <section aria-label="Geolocation information" class="space-y-2 w-full max-w-[480px] text-center text-slate-700 select-none">
+    <p id="location" class="font-semibold text-xl leading-tight mb-1">
+     Loading location...
+    </p>
+    <p id="isp" class="text-base font-normal text-slate-500">
+     Loading ISP...
+    </p>
+   </section>
+   <section id="powered-by" class="mt-4 w-full max-w-[480px] flex flex-col gap-1 items-center text-center">
+    <div>
+     Powered by
+     <a href="https://ipapi.co" rel="noopener noreferrer" target="_blank" title="Visit ipapi.co website" class="underline hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+      ipapi.co
+     </a>
+    </div>
+    <div id="developer-credit" class="text-sm text-slate-500 select-text">
+     Developed by Deepak Dev
+    </div>
+   </section>
+  </main>
+  <script>
+   // Sanitize and validate IPv4 format
+    function isValidIPv4(ip) {
+      if (typeof ip !== "string") return false;
+      const parts = ip.trim().split(".");
+      if (parts.length !== 4) return false;
+      for (const part of parts) {
+        if (!/^\d+$/.test(part)) return false;
+        const num = Number(part);
+        if (num < 0 || num > 255) return false;
+      }
+      return true;
+    }
+
+    // Format IP to standard IPv4 (remove leading zeros)
+    function formatIPv4(ip) {
+      if (!isValidIPv4(ip)) return ip;
+      return ip.split(".").map((part) => String(Number(part))).join(".");
+    }
+
+    async function fetchIPData() {
+      try {
+        const response = await fetch("https://ipapi.co/json/", {
+          method: "GET",
+          mode: "cors",
+          cache: "no-cache",
+          credentials: "omit",
+          headers: {
+            Accept: "application/json",
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch IP data");
+        const data = await response.json();
+
+        const ipEl = document.getElementById("ip-address");
+        const flagEl = document.getElementById("country-flag");
+        const vpnStatusEl = document.getElementById("vpn-status");
+
+        let ip = data.ip || "Unavailable";
+        if (isValidIPv4(ip)) {
+          ip = formatIPv4(ip);
+        }
+        ipEl.textContent = ip;
+
+        if (data.country_code) {
+          flagEl.src = `https://countryflagsapi.com/png/${data.country_code}`;
+          flagEl.alt = `Flag of ${data.country_name || data.country_code}`;
+        } else {
+          flagEl.src = "https://placehold.co/56x38/png?text=--";
+          flagEl.alt = "No country flag available";
+        }
+
+        const vpnDetected =
+          data.security && (data.security.vpn === true || data.security.proxy === true);
+
+        if (vpnDetected) {
+          vpnStatusEl.classList.add("visible");
+          vpnStatusEl.classList.remove("hidden");
+        } else {
+          vpnStatusEl.classList.remove("visible");
+          vpnStatusEl.classList.add("hidden");
+        }
+
+        const locationEl = document.getElementById("location");
+        const city = data.city || "";
+        const region = data.region || "";
+        const country = data.country_name || "";
+        let locationText = "";
+        if (city && region && country) {
+          locationText = `${city}, ${region}, ${country}`;
+        } else if (city && country) {
+          locationText = `${city}, ${country}`;
+        } else if (region && country) {
+          locationText = `${region}, ${country}`;
+        } else if (country) {
+          locationText = country;
+        } else {
+          locationText = "Location unavailable";
+        }
+        locationEl.textContent = locationText;
+
+        const ispEl = document.getElementById("isp");
+        ispEl.textContent = data.org || "ISP information unavailable";
+      } catch (error) {
+        const ipEl = document.getElementById("ip-address");
+        const flagEl = document.getElementById("country-flag");
+        const vpnStatusEl = document.getElementById("vpn-status");
+        const locationEl = document.getElementById("location");
+        const ispEl = document.getElementById("isp");
+
+        ipEl.textContent = "Unable to load IP data";
+        flagEl.src = "https://placehold.co/56x38/png?text=--";
+        flagEl.alt = "No country flag available";
+        vpnStatusEl.classList.remove("visible");
+        vpnStatusEl.classList.add("hidden");
+        locationEl.textContent = "Unable to load location";
+        ispEl.textContent = "Unable to load ISP info";
+        console.error("Error fetching IP data:", error);
+      }
+    }
+
+    // Copy IP to clipboard with tooltip feedback
+    function setupCopyButton() {
+      const copyBtn = document.getElementById("copy-btn");
+      const ipEl = document.getElementById("ip-address");
+      const tooltip = document.getElementById("copy-tooltip");
+
+      copyBtn.addEventListener("click", async () => {
+        try {
+          const ipText = ipEl.textContent.trim();
+          if (!ipText || ipText === "Loading IP..." || ipText === "Unavailable") return;
+          await navigator.clipboard.writeText(ipText);
+          tooltip.classList.add("show");
+          setTimeout(() => {
+            tooltip.classList.remove("show");
+          }, 1500);
+        } catch {
+          const textarea = document.createElement("textarea");
+          textarea.value = ipEl.textContent.trim();
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            document.execCommand("copy");
+            tooltip.classList.add("show");
+            setTimeout(() => {
+              tooltip.classList.remove("show");
+            }, 1500);
+          } catch {
+            alert("Failed to copy IP address");
+          }
+          document.body.removeChild(textarea);
+        }
+      });
+    }
+
+    // Speed test implementation using simple download/upload tests and ping
+    // Note: This is a simplified speed test and may not be as accurate as dedicated services.
+    // It uses fetch to download/upload a file and measures time.
+
+    const speedTestBtn = document.getElementById("speed-test-btn");
+    const speedTestContainer = document.getElementById("speed-test-container");
+    const speedTestStatus = document.getElementById("speed-test-status");
+    const speedResults = document.getElementById("speed-results");
+    const pingResult = document.getElementById("ping-result");
+    const downloadResult = document.getElementById("download-result");
+    const uploadResult = document.getElementById("upload-result");
+
+    // URLs for testing - small files for ping, larger for download/upload
+    // Using public test files from https://speed.hetzner.de/ (1MB, 10MB)
+    const TEST_DOWNLOAD_URL = "https://speed.hetzner.de/10MB.bin";
+    const TEST_UPLOAD_URL = "https://httpbin.org/post"; // httpbin accepts POST for upload test
+
+    // Helper: measure ping by fetching a small file multiple times and averaging
+    async function measurePing(iterations = 5) {
+      const pingUrl = "https://speed.hetzner.de/100KB.bin"; // small file for ping test
+      let totalTime = 0;
+      for (let i = 0; i < iterations; i++) {
+        const start = performance.now();
+        try {
+          await fetch(pingUrl, { cache: "no-store", mode: "cors" });
+        } catch {
+          // ignore errors, count as max ping 1000ms
+          totalTime += 1000;
+          continue;
+        }
+        const end = performance.now();
+        totalTime += end - start;
+        await new Promise((r) => setTimeout(r, 100)); // small delay between pings
+      }
+      return (totalTime / iterations).toFixed(0);
+    }
+
+    // Helper: measure download speed in Mbps
+    async function measureDownload() {
+      const start = performance.now();
+      try {
+        const response = await fetch(TEST_DOWNLOAD_URL, { cache: "no-store", mode: "cors" });
+        if (!response.ok) throw new Error("Download failed");
+        const reader = response.body.getReader();
+        let receivedLength = 0;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          receivedLength += value.length;
+        }
+        const end = performance.now();
+        const duration = (end - start) / 1000; // seconds
+        const bitsLoaded = receivedLength * 8;
+        const speedMbps = (bitsLoaded / duration / 1_000_000).toFixed(2);
+        return speedMbps;
+      } catch {
+        return null;
+      }
+    }
+
+    // Helper: measure upload speed in Mbps by uploading random data
+    async function measureUpload() {
+      // Create ~5MB random data blob
+      const size = 5 * 1024 * 1024;
+      const data = new Uint8Array(size);
+      crypto.getRandomValues(data);
+      const blob = new Blob([data]);
+
+      const start = performance.now();
+      try {
+        const response = await fetch(TEST_UPLOAD_URL, {
+          method: "POST",
+          mode: "cors",
+          cache: "no-store",
+          body: blob,
+          headers: {
+            "Content-Type": "application/octet-stream",
+          },
+        });
+        if (!response.ok) throw new Error("Upload failed");
+        const end = performance.now();
+        const duration = (end - start) / 1000; // seconds
+        const bitsUploaded = size * 8;
+        const speedMbps = (bitsUploaded / duration / 1_000_000).toFixed(2);
+        return speedMbps;
+      } catch {
+        return null;
+      }
+    }
+
+    async function runSpeedTest() {
+      speedTestBtn.disabled = true;
+      speedTestBtn.setAttribute("aria-busy", "true");
+      speedTestStatus.textContent = "Measuring ping...";
+      speedResults.classList.add("hidden");
+      pingResult.textContent = "-- ms";
+      downloadResult.textContent = "-- Mbps";
+      uploadResult.textContent = "-- Mbps";
+
+      try {
+        const ping = await measurePing();
+        speedTestStatus.textContent = "Measuring download speed...";
+        const download = await measureDownload();
+        speedTestStatus.textContent = "Measuring upload speed...";
+        const upload = await measureUpload();
+
+        pingResult.textContent = ping !== null ? `${ping} ms` : "Failed";
+        downloadResult.textContent = download !== null ? `${download} Mbps` : "Failed";
+        uploadResult.textContent = upload !== null ? `${upload} Mbps` : "Failed";
+
+        speedTestStatus.textContent = "Speed test completed";
+        speedResults.classList.remove("hidden");
+      } catch (e) {
+        speedTestStatus.textContent = "Speed test failed. Please try again.";
+        speedResults.classList.add("hidden");
+      } finally {
+        speedTestBtn.disabled = false;
+        speedTestBtn.removeAttribute("aria-busy");
+      }
+    }
+
+    // Toggle speed test container visibility
+    function toggleSpeedTest() {
+      if (speedTestContainer.classList.contains("visible")) {
+        speedTestContainer.classList.remove("visible");
+        speedTestBtn.setAttribute("aria-expanded", "false");
+      } else {
+        speedTestContainer.classList.add("visible");
+        speedTestBtn.setAttribute("aria-expanded", "true");
+        runSpeedTest();
+      }
+    }
+
+    window.addEventListener("load", () => {
+      fetchIPData();
+      setupCopyButton();
+      speedTestBtn.addEventListener("click", toggleSpeedTest);
+    });
+
+    // Copy IP to clipboard with tooltip feedback
+    function setupCopyButton() {
+      const copyBtn = document.getElementById("copy-btn");
+      const ipEl = document.getElementById("ip-address");
+      const tooltip = document.getElementById("copy-tooltip");
+
+      copyBtn.addEventListener("click", async () => {
+        try {
+          const ipText = ipEl.textContent.trim();
+          if (!ipText || ipText === "Loading IP..." || ipText === "Unavailable") return;
+          await navigator.clipboard.writeText(ipText);
+          tooltip.classList.add("show");
+          setTimeout(() => {
+            tooltip.classList.remove("show");
+          }, 1500);
+        } catch {
+          const textarea = document.createElement("textarea");
+          textarea.value = ipEl.textContent.trim();
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            document.execCommand("copy");
+            tooltip.classList.add("show");
+            setTimeout(() => {
+              tooltip.classList.remove("show");
+            }, 1500);
+          } catch {
+            alert("Failed to copy IP address");
+          }
+          document.body.removeChild(textarea);
+        }
+      });
+    }
+  </script>
+ </body>
+</html>
